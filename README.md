@@ -3,3 +3,7 @@ Criei esse projeto usando npx create-react-app. Sei que hoje em dia essa ferrame
 Também estou usando o Yarn, pra me familiarizar com diferentes gerenciadores de pacotes.
 
 Como nesse projeto estou trabalhando com rotas, instalei o npm install react-router-dom.
+
+Foi istalado o style-componetes
+
+Instalei npm install react-icons
