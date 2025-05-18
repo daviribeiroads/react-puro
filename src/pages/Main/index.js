@@ -1,12 +1,21 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { FaGithub, FaPlus, FaSpinner, FaBars, FaTrash } from "react-icons/fa";
 import { Container, Form, SubmitButton, List, DeleteButton } from "./styles";
 import api from "../../services/api";
 
 export default function Main() {
   const [newRepo, setNewRepo] = useState("");
-  const [repositorios, setRepositorios] = useState([]);
+  const [repositorios, setRepositorios] = useState(() => {
+    const repoStorage = localStorage.getItem("repos");
+    return repoStorage ? JSON.parse(repoStorage) : [];
+  });
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
+
+  // Salvar alterações no localStorage quando repositorios mudar
+  useEffect(() => {
+    localStorage.setItem("repos", JSON.stringify(repositorios));
+  }, [repositorios]);
 
   const handleSubmit = useCallback(
     (e) => {
@@ -14,8 +23,19 @@ export default function Main() {
 
       async function submit() {
         setLoading(true);
+        setAlert(null);
         try {
           const response = await api.get(`repos/${newRepo}`);
+
+          const hasRepo = repositorios.find(
+            (repo) => repo.name.toLowerCase() === newRepo.toLowerCase()
+          );
+
+          if (hasRepo) {
+            alert("Repositório já foi adicionado.");
+            setLoading(false);
+            return;
+          }
 
           const data = {
             name: response.data.full_name,
@@ -24,14 +44,7 @@ export default function Main() {
           setRepositorios([...repositorios, data]);
           setNewRepo("");
         } catch (error) {
-          if (error.response && error.response.status === 404) {
-            alert(
-              "Repositório não encontrado. Verifique se o endereço está correto (ex: usuario/repositorio)"
-            );
-          } else {
-            alert("Erro ao buscar repositório. Tente novamente mais tarde.");
-            console.error(error); // opcional: útil só para devs
-          }
+          setAlert(true);
         } finally {
           setLoading(false);
         }
@@ -42,28 +55,32 @@ export default function Main() {
     [newRepo, repositorios]
   );
 
-  function handleinputChange(e) {
+  function handleInputChange(e) {
     setNewRepo(e.target.value);
+    setAlert(null);
   }
 
-  const handleDelete = useCallback((repo)=> {
-      const find = repositorios.filter(r => r.name !== repo);
+  const handleDelete = useCallback(
+    (repo) => {
+      const find = repositorios.filter((r) => r.name !== repo);
       setRepositorios(find);
-    }, [repositorios]);
+    },
+    [repositorios]
+  );
 
   return (
     <Container>
       <h1>
         <FaGithub size={25} />
-        Meus Repositorio
+        Meus Repositórios
       </h1>
 
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} error={alert}>
         <input
           type="text"
-          placeholder="Adicionar Repositorios"
+          placeholder="Adicionar repositório"
           value={newRepo}
-          onChange={handleinputChange}
+          onChange={handleInputChange}
         />
 
         <SubmitButton loading={loading ? 1 : 0}>
