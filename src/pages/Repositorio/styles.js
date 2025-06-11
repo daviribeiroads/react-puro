@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const Loading = styled.div`
     color: #FFF;
@@ -13,7 +14,7 @@ export const Container = styled.div`
     background: #FFF;
     border-radius: 4px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 2.0);
-    padding: 0 30px;
+    padding: 30px;
     margin: 80px auto;
 `;
 
@@ -45,8 +46,65 @@ export const Owner = styled.header`
 
 `;
 
-export const BackButton = styled.button`
+export const BackButton = styled(Link)`
+`;
 
+export const IssuesList = styled.ul`
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+    list-style: none;
 
+    li{
+        display: flex;
+        padding: 15px 10px;
+
+        img{
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #0D2636;
+    }
+
+    div{
+        flex: 1;
+        margin-left: 12px;
+
+        P{
+            flex: 1px;
+            font-size: 12px;
+            color: #000;
+        }
+
+    }
+
+    strong{
+        font-size: 15px;
+
+        a{
+            text-decoration: none;
+            color: #222;
+
+            &:hover{
+                color: #0071db;
+            }
+
+        }
+
+        span{
+            background: #222;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 7px;
+            margin-left: 10px;
+        }
+
+    }
+
+    }
+
+   
 `;
 
