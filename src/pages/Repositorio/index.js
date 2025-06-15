@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
-import { Container, Owner, Loading, BackButton, IssuesList } from "./styles";
+import { Container, Owner, Loading, BackButton, IssuesList, PageActions } from "./styles";
 import { FaArrowLeft } from "react-icons/fa";
 
 export default function Repositorio() {
@@ -9,6 +9,7 @@ export default function Repositorio() {
   const [repoData, setRepoData] = useState({});
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     async function load() {
@@ -37,6 +38,28 @@ export default function Repositorio() {
     load();
   }, [repositorio]);
 
+  useEffect(() => {
+    async function loadIssue() {
+      const nomeRepo = decodeURIComponent(repositorio);
+
+      const response = await api.get(`/repos/${nomeRepo}/issues`, {
+        params: {
+          state: "open",
+          page,
+          per_page: 5,
+        },
+      });
+
+      setIssues(response.data);
+    }
+
+    loadIssue();
+  }, [repositorio, page]);
+
+  function handlePage(actions) {
+    setPage(actions === 'back' ? page - 1 : page + 1);
+  }
+
   if (loading || !repoData.owner) {
     return (
       <Loading>
@@ -61,7 +84,6 @@ export default function Repositorio() {
         {issues.map((issue) => (
           <li key={String(issue.id)}>
             <img src={issue.user.avatar_url} alt={issue.user.login} />
-
             <div>
               <strong>
                 <a href={issue.html_url}>{issue.title}</a>
@@ -74,6 +96,15 @@ export default function Repositorio() {
           </li>
         ))}
       </IssuesList>
+
+      <PageActions>
+        <button type="button" onClick={() => handlePage('back')} disabled={page < 2}>
+          Voltar
+        </button>
+        <button type="button" onClick={() => handlePage('next')}>
+          Próxima
+        </button>
+      </PageActions>
     </Container>
   );
 }
